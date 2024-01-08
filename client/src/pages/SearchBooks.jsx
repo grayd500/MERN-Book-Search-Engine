@@ -1,3 +1,4 @@
+// client/src/pages/SearchBooks.jsx:
 import { useState, useEffect } from 'react';
 import { Container, Col, Form, Button, Card, Row, Alert } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
@@ -59,8 +60,18 @@ const SearchBooks = () => {
 
     try {
       await saveBook({
-        variables: { bookInput: bookToSave },
+        variables: {
+          input: {
+            authors: bookToSave.authors,
+            description: bookToSave.description,
+            title: bookToSave.title,
+            bookId: bookToSave.bookId,
+            image: bookToSave.image,
+            link: bookToSave.link
+          },
+        },
       });
+      
 
       setSavedBookIds([...savedBookIds, bookId]);
     } catch (err) {

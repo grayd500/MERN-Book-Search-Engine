@@ -19,7 +19,7 @@ const server = new ApolloServer({
   resolvers,
   context: ({ req }) => {
     console.log('Apollo Server context. Request:', req);
-    return { req };
+    return {  user: req.user };
   }
 });
 

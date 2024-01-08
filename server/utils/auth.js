@@ -17,14 +17,17 @@ module.exports = {
       token = token.split(' ').pop().trim();
     }
 
+    console.log("Extracted Token:", token); // Log the extracted token
+
     if (token) {
-      try {
-        const { data } = jwt.verify(token, secret, { maxAge: expiration });
-        req.user = data;
-      } catch (error) {
-        console.log('Invalid token: ', error.message);
-      }
+    try {
+      const { data } = jwt.verify(token, secret, { maxAge: expiration });
+      req.user = data;
+      console.log("Verified User:", req.user); // Log the verified user data
+    } catch (error) {
+      console.log('Invalid token: ', error.message);
     }
+  }
 
     next(); // Proceed to next middleware
   }

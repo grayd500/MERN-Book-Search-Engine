@@ -39,11 +39,27 @@ const resolvers = {
       return { token, user };
     },
     
-    saveBook: async (_, args, context) => {
-      //... (similar to async saveBook in user-controller.js)
+    saveBook: async (_, { input }, context) => {
+      if (context.user) {
+        return await User.findByIdAndUpdate(
+          context.user._id,
+          { $addToSet: { savedBooks: input } }, // use input instead of bookData
+          { new: true, runValidators: true }
+        ).populate('savedBooks');
+      }
+      throw new Error('You need to be logged in!');
     },
+   
+
     removeBook: async (_, { bookId }, context) => {
-      //... (similar to async deleteBook in user-controller.js)
+      if (context.user) {
+        return await User.findByIdAndUpdate(
+          context.user._id,
+          { $pull: { savedBooks: { bookId } } },
+          { new: true }
+        ).populate('savedBooks');
+      }
+      throw new Error('You need to be logged in!');
     },
   },
 };
