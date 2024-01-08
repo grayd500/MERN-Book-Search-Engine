@@ -114,24 +114,31 @@ const SearchBooks = () => {
 
       <Container>
         <Row>
-          {searchedBooks.map((book) => (
-            <Col key={book.bookId} xs={12} md={4}>
-              <Card>
-                <Card.Img src={book.image} alt={`The cover for ${book.title}`} />
-                <Card.Body>
-                  <Card.Title>{book.title}</Card.Title>
-                  <p>{book.authors.join(', ')}</p>
-                  <Card.Text>{book.description}</Card.Text>
-                  <Button 
-                    disabled={savedBookIds.includes(book.bookId)}
-                    onClick={() => handleSaveBook(book.bookId)}
-                    variant='primary'>
-                    {savedBookIds.includes(book.bookId) ? 'Saved' : 'Save'}
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
+        {searchedBooks.map((book) => (
+  <Col key={book.bookId} xs={12} md={4}>
+    <Card>
+      <a href={book.link} target="_blank" rel="noopener noreferrer">
+        <Card.Img src={book.image} alt={`The cover for ${book.title}`} />
+      </a>
+      <Card.Body>
+        <Card.Title>
+          <a href={book.link} target="_blank" rel="noopener noreferrer">
+            {book.title}
+          </a>
+        </Card.Title>
+        <p>{book.authors.join(', ')}</p>
+        <Card.Text>{book.description}</Card.Text>
+        <Button 
+          disabled={savedBookIds.includes(book.bookId)}
+          onClick={() => handleSaveBook(book.bookId)}
+          variant='primary'>
+          {savedBookIds.includes(book.bookId) ? 'Saved' : 'Save'}
+        </Button>
+      </Card.Body>
+    </Card>
+  </Col>
+))}
+
         </Row>
       </Container>
     </>
