@@ -1,3 +1,4 @@
+// server/schemas/resolvers.js:
 const { User } = require('../models');
 const { signToken } = require('../utils/auth');
 
@@ -14,11 +15,30 @@ const resolvers = {
   Mutation: {
     // Use logic from user-controller.js for user authentication and user creation
     login: async (_, { email, password }) => {
-      //... (similar to async login in user-controller.js)
+      const user = await User.findOne({ email });
+    
+      if (!user) {
+        throw new Error('Incorrect credentials');
+      }
+    
+      const correctPw = await user.isCorrectPassword(password);
+    
+      if (!correctPw) {
+        throw new Error('Incorrect credentials');
+      }
+    
+      const token = signToken(user);
+    
+      return { token, user };
     },
-    addUser: async (_, args) => {
-      //... (similar to async createUser in user-controller.js)
+    
+    addUser: async (_, { username, email, password }) => {
+      const user = await User.create({ username, email, password });
+      const token = signToken(user);
+    
+      return { token, user };
     },
+    
     saveBook: async (_, args, context) => {
       //... (similar to async saveBook in user-controller.js)
     },
