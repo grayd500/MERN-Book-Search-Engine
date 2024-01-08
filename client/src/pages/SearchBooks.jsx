@@ -2,15 +2,17 @@
 import { useState, useEffect } from 'react';
 import { Container, Col, Form, Button, Card, Row, Alert } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
+
 import Auth from '../utils/auth';
 import { SAVE_BOOK } from '../utils/mutations';
 import { getSavedBookIds, saveBookIds } from '../utils/localStorage';
-import { searchGoogleBooks } from '../utils/API'; // Ensure this import is correct
+import { searchGoogleBooks } from '../utils/API';
 
 const SearchBooks = () => {
   const [searchedBooks, setSearchedBooks] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [saveBook, { error }] = useMutation(SAVE_BOOK);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ const SearchBooks = () => {
     try {
       const response = await searchGoogleBooks(searchInput);
       if (!response.ok) {
-        throw new Error('something went wrong!');
+        throw new Error('Something went wrong!');
       }
 
       const { items } = await response.json();
@@ -71,9 +73,9 @@ const SearchBooks = () => {
           },
         },
       });
-      
 
       setSavedBookIds([...savedBookIds, bookId]);
+      setShowSuccessAlert(true); // Set the success alert to true
     } catch (err) {
       console.error(err);
     }
@@ -82,6 +84,11 @@ const SearchBooks = () => {
   return (
     <>
       <Container>
+        {showSuccessAlert && (
+          <Alert variant="success" onClose={() => setShowSuccessAlert(false)} dismissible>
+            Book saved successfully!
+          </Alert>
+        )}
         {error && <Alert variant="danger">An error occurred: {error.message}</Alert>}
         <h1>Search for Books!</h1>
         <Form onSubmit={handleFormSubmit}>

@@ -1,5 +1,6 @@
 // client/src/pages/SavedBooks.jsx:
-import { Container, Card, Button, Row, Col } from 'react-bootstrap';
+import { useState } from 'react';
+import { Container, Card, Button, Row, Col, Alert } from 'react-bootstrap';
 import { useQuery, useMutation } from '@apollo/client';
 import Auth from '../utils/auth';
 import { GET_ME } from '../utils/queries';
@@ -9,14 +10,16 @@ import { removeBookId } from '../utils/localStorage';
 const SavedBooks = () => {
   const { loading, data } = useQuery(GET_ME);
   const userData = data?.me || {};
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   const [removeBook] = useMutation(REMOVE_BOOK, {
     update(cache, { data: { removeBook } }) {
       cache.modify({
         fields: {
-          me(existingMeData) {
-            const newSavedBooks = existingMeData.savedBooks.filter(
-              book => book.bookId !== removeBook.bookId
+          me(existingMeData, { readField }) {
+            const currentSavedBooks = readField('savedBooks', existingMeData);
+            const newSavedBooks = currentSavedBooks.filter(
+              (book) => readField('bookId', book) !== removeBook.bookId
             );
             return { ...existingMeData, savedBooks: newSavedBooks };
           }
@@ -34,6 +37,7 @@ const SavedBooks = () => {
     try {
       await removeBook({ variables: { bookId } });
       removeBookId(bookId);
+      setShowSuccessAlert(true); // Set the success alert to true
     } catch (err) {
       console.error(err);
     }
@@ -45,6 +49,11 @@ const SavedBooks = () => {
 
   return (
     <Container>
+      {showSuccessAlert && (
+        <Alert variant="success" onClose={() => setShowSuccessAlert(false)} dismissible>
+          Book deleted successfully!
+        </Alert>
+      )}
       <h1>Viewing saved books!</h1>
       <Row>
         {userData.savedBooks.map((book) => (
@@ -68,4 +77,3 @@ const SavedBooks = () => {
 };
 
 export default SavedBooks;
-
